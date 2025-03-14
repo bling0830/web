@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能文本分类系统</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', path='/css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-robot"></i>
+            <span>AI文本分类</span>
+        </div>
+        <nav>
+            <a href="#" class="nav-item active" onclick="showTab('classify')">
+                <i class="fas fa-search"></i>
+                <span>文本分类</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showTab('annotate')">
+                <i class="fas fa-edit"></i>
+                <span>数据标注</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showTab('history')">
+                <i class="fas fa-history"></i>
+                <span>历史记录</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div id="classify-tab" class="tab-content active">
+            <div class="card">
+                <h2><i class="fas fa-search"></i> 文本分类</h2>
+                <div class="input-group">
+                    <textarea id="input-text" placeholder="请输入要分类的文本..."></textarea>
+                    <button class="primary-btn" onclick="classifyText()">
+                        <i class="fas fa-play"></i> 开始分类
+                    </button>
+                </div>
+                <div id="result" class="result-box hidden">
+                    <div class="loader hidden"></div>
+                    <div class="result-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="annotate-tab" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-edit"></i> 数据标注</h2>
+                <div class="annotation-container">
+                    <!-- 左侧标注区域 -->
+                    <div class="annotation-input">
+                        <div class="input-group">
+                            <textarea id="annotate-text" placeholder="请输入要标注的文本..."></textarea>
+                            <div class="annotation-inputs">
+                                <div class="input-field">
+                                    <i class="fas fa-tag"></i>
+                                    <select id="main-category" class="category-select">
+                                        <option value="">请选择主类别</option>
+                                        <option value="正向价值观">正向价值观</option>
+                                        <option value="负向价值观">负向价值观</option>
+                                        <option value="中性">中性</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <i class="fas fa-tags"></i>
+                                    <div id="sub-categories-container" class="sub-categories-container">
+                                        <!-- 子类别选项将通过 JavaScript 动态加载 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧大模型参考区域 -->
+                    <div class="model-reference">
+                        <h3><i class="fas fa-robot"></i> AI 参考建议</h3>
+                        <button class="primary-btn get-ai-btn" onclick="requestAISuggestion()">
+                            <i class="fas fa-lightbulb"></i> 获取AI建议
+                        </button>
+                        <div id="model-suggestion" class="model-suggestion">
+                            <div class="suggestion-content">
+                                <!-- AI建议将在这里显示 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="training-status">
+                    <div class="button-group">
+                        <button class="primary-btn" onclick="submitAnnotation()">
+                            <i class="fas fa-save"></i> 提交标注
+                        </button>
+                        <button class="secondary-btn" onclick="retrainModel()">
+                            <i class="fas fa-sync"></i> 重新训练模型
+                        </button>
+                    </div>
+                    <div id="training-status" class="status-box hidden">
+                        <div class="status-content">
+                            <i class="fas fa-cog fa-spin"></i>
+                            <span id="training-message">模型训练中...</span>
+                        </div>
+                        <div class="training-stats">
+                            <p>训练数据量: <span id="data-count">0</span> 条</p>
+                            <p>已训练时间: <span id="training-time">0</span> 秒</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 添加数据表格 -->
+            <div class="annotations-table-container">
+                <h3><i class="fas fa-table"></i> 标注数据列表</h3>
+                <table id="annotations-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>文本</th>
+                            <th>主类别</th>
+                            <th>子类别</th>
+                            <th>时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 数据将通过 JavaScript 动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="history-tab" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-history"></i> 分类历史</h2>
+                <div id="history-list" class="history-container">
+                    <!-- 历史记录将在这里动态显示 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', path='/js/main.js') }}"></script>
+</body>
+</html> 

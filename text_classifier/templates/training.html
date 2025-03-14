@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>模型训练</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>模型训练控制台</h1>
+        
+        <!-- 训练数据统计 -->
+        <div class="stats-container">
+            <h2>训练数据统计</h2>
+            <div id="training-stats"></div>
+            <div id="category-distribution"></div>
+        </div>
+
+        <!-- 训练参数配置 -->
+        <div class="training-config">
+            <h2>训练参数配置</h2>
+            <form id="training-form">
+                <div class="form-group">
+                    <label>训练轮数 (Epochs):</label>
+                    <input type="number" name="epochs" value="10" min="1">
+                </div>
+                <div class="form-group">
+                    <label>批次大小 (Batch Size):</label>
+                    <input type="number" name="batch_size" value="32" min="1">
+                </div>
+                <div class="form-group">
+                    <label>学习率 (Learning Rate):</label>
+                    <input type="number" name="learning_rate" value="0.001" step="0.0001">
+                </div>
+                <div class="form-group">
+                    <label>验证集比例 (Validation Split):</label>
+                    <input type="number" name="validation_split" value="0.2" min="0" max="1" step="0.1">
+                </div>
+                <button type="submit">开始训练</button>
+            </form>
+        </div>
+
+        <!-- 训练状态和结果 -->
+        <div class="training-status">
+            <h2>训练状态</h2>
+            <div id="status-message"></div>
+        </div>
+    </div>
+
+    <script>
+        // 获取训练数据统计
+        async function fetchTrainingStats() {
+            const response = await fetch('/training-data');
+            const data = await response.json();
+            
+            document.getElementById('training-stats').innerHTML = `
+                <p>总数据量: ${data.stats.total}</p>
+                <p>类别数量: ${data.stats.categories}</p>
+            `;
+
+            // 显示类别分布
+            const distribution = Object.entries(data.distribution)
+                .map(([category, count]) => `<p>${category}: ${count}条</p>`)
+                .join('');
+            document.getElementById('category-distribution').innerHTML = distribution;
+        }
+
+        // 提交训练
+        document.getElementById('training-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const config = Object.fromEntries(formData.entries());
+            
+            document.getElementById('status-message').innerHTML = '训练中...';
+            
+            try {
+                const response = await fetch('/retrain', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(config)
+                });
+                
+                const result = await response.json();
+                document.getElementById('status-message').innerHTML = 
+                    `训练完成: ${result.message}`;
+            } catch (error) {
+                document.getElementById('status-message').innerHTML = 
+                    `训练失败: ${error.message}`;
+            }
+        };
+
+        // 页面加载时获取统计数据
+        fetchTrainingStats();
+    </script>
+</body>
+</html> 
